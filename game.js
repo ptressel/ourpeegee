@@ -1,8 +1,10 @@
 var Game = require('crtrdg-gameloop');
 var Keyboard = require('crtrdg-keyboard');
 var SceneManager = require('crtrdg-scene');
+var Inventory = require('./inventory');
 var Player = require('./player');
 var Door = require('./door');
+var Item = require('./item');
 
 var game = new Game({
   canvasId: 'game',
@@ -19,6 +21,23 @@ game.on('pause', function(){});
 
 game.on('resume', function(){});
 
+
+
+/*
+*
+* INVENTORY & ITEMS
+*
+*/
+
+var inventory = new Inventory(game);
+
+var pizza = new Item({
+  name: 'pizza',
+  position: {
+    x: 500,
+    y: 200
+  }
+});
 
 
 /*
@@ -161,11 +180,17 @@ levelOne.on('init', function(){
   console.log('this is level one')
   player.visible = true;
   door.addTo(game);
+  pizza.addTo(game);
 });
 
 levelOne.on('update', function(interval){
   if (player.boundingBox.intersects(door.boundingBox)){
     sceneManager.set(levelTwo);
+  }
+
+  if (player.boundingBox.intersects(pizza.boundingBox)){
+    inventory.add(pizza);
+    pizza.remove();
   }
 });
 
