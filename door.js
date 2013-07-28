@@ -12,11 +12,11 @@ function Door(options){
   };
 
   this.size = {
-    x: 10,
-    y: 20
+    x: 20,
+    y: 40
   };
 
-  this.color: '#46461';
+  this.color = '#999';
   this.setBoundingBox();
 }
 

@@ -2,6 +2,7 @@ var Game = require('crtrdg-gameloop');
 var Keyboard = require('crtrdg-keyboard');
 var SceneManager = require('crtrdg-scene');
 var Player = require('./player');
+var Door = require('./door');
 
 var game = new Game({
   canvasId: 'game',
@@ -19,8 +20,11 @@ game.on('pause', function(){});
 game.on('resume', function(){});
 
 
+
 /*
+*
 * KEYBOARD
+*
 */
 
 var keyboard = new Keyboard(game);
@@ -45,8 +49,12 @@ keyboard.on('keydown', function(key){
   }
 });
 
+
+
 /*
+*
 * PLAYER
+*
 */
 
 var player = new Player({
@@ -80,14 +88,22 @@ player.on('draw', function(context){
   }
 });
 
+
+
 /*
+*
 * SCENE MANAGER
+*
 */
 
 var sceneManager = new SceneManager(game);
 
+
+
 /*
+*
 * MAIN MENU
+*
 */
 
 var menu = sceneManager.create({
@@ -104,8 +120,12 @@ menu.on('init', function(){
 // set main menu as first screen
 sceneManager.set(menu);
 
+
+
 /*
+*
 * PAUSE MENU
+*
 */
 
 var pauseMenu = sceneManager.create({
@@ -117,8 +137,12 @@ pauseMenu.on('init', function(){
   console.log('this is the pause menu');
 });
 
+
+
 /*
+*
 * LEVEL ONE
+*
 */
 
 var levelOne = sceneManager.create({
@@ -126,7 +150,42 @@ var levelOne = sceneManager.create({
   backgroundColor: 'rgb(1,255,155)'
 });
 
+var door = new Door({ position: { x: 100, y: 200 } });
+
+door.on('draw', function(context){
+  context.fillStyle = door.color;
+  context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);    
+});
+
 levelOne.on('init', function(){
   console.log('this is level one')
   player.visible = true;
+  door.addTo(game);
 });
+
+levelOne.on('update', function(interval){
+  if (player.boundingBox.intersects(door.boundingBox)){
+    sceneManager.set(levelTwo);
+  }
+});
+
+
+
+/*
+*
+* LEVEL TWO
+*
+*/
+
+var levelTwo = sceneManager.create({
+  name: 'level two',
+  backgroundColor: 'rgb(111, 42, 237)'
+});
+
+levelTwo.on('init', function(){
+  console.log('this is level two');
+  door.position = {
+    x: 500,
+    y: 100
+  }
+})
