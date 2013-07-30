@@ -24,7 +24,6 @@ game.on('resume', function(){});
 
 var title = new Text({ 
   el: '#title',
-  height: '100',
   styles: { 
     height: '40px',
     padding: '30px 0px',
@@ -32,7 +31,6 @@ var title = new Text({
     color: '#ff0000'
   }
 });
-
 
 /*
 *
@@ -158,7 +156,7 @@ var menu = sceneManager.create({
 
 menu.on('init', function(){
   console.log('this is the menu.');
-  title.update('this is the menu.');
+  title.update('ourpeegee.');
   player.visible = false;
   game.pause();
 });
@@ -202,7 +200,7 @@ levelOne.on('init', function(){
   player.visible = true;
   door.addTo(game);
   pizza.addTo(game);
-  title.update('this is level one.');
+  title.update('find the item and the door.');
 });
 
 levelOne.on('update', function(interval){
@@ -231,7 +229,7 @@ var levelTwo = sceneManager.create({
 
 levelTwo.on('init', function(){
   console.log('this is level two.');
-  title.update('this is level two.');
+  title.update('you are stuck.');
   door.position = {
     x: 500,
     y: 100
