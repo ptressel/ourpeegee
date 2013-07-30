@@ -6,6 +6,7 @@ var Player = require('./player');
 var Door = require('./door');
 var Item = require('./item');
 var Text = require('./text');
+var Log = require('./log');
 
 var game = new Game({
   canvasId: 'game',
@@ -31,6 +32,10 @@ var title = new Text({
     color: '#ff0000'
   }
 });
+
+var log = new Log({ height: '50px', width: '300px' });
+log.add('!');
+
 
 /*
 *
@@ -155,7 +160,7 @@ var menu = sceneManager.create({
 });
 
 menu.on('init', function(){
-  console.log('this is the menu.');
+  log.add('welcome to ourpeegee')
   title.update('ourpeegee.');
   player.visible = false;
   game.pause();
@@ -196,7 +201,7 @@ var levelOne = sceneManager.create({
 });
 
 levelOne.on('init', function(){
-  console.log('this is level one.')
+  log.add('level one is the best level so far.')
   player.visible = true;
   door.addTo(game);
   pizza.addTo(game);
@@ -205,12 +210,14 @@ levelOne.on('init', function(){
 
 levelOne.on('update', function(interval){
   if (player.boundingBox.intersects(door.boundingBox)){
+    log.add('you found the door!');
     sceneManager.set(levelTwo);
   }
 
   if (player.boundingBox.intersects(pizza.boundingBox)){
-    inventory.add(pizza);
+    log.add('you found the pizza!');
     pizza.remove();
+    inventory.add(pizza);
   }
 });
 
@@ -228,10 +235,16 @@ var levelTwo = sceneManager.create({
 });
 
 levelTwo.on('init', function(){
-  console.log('this is level two.');
+  log.add('level two is the last level. lame, right?');
   title.update('you are stuck.');
   door.position = {
     x: 500,
     y: 100
   }
-})
+});
+
+levelTwo.on('update', function(interval){
+  if (player.boundingBox.intersects(door.boundingBox)){
+    log.add("yeah, that doesn't do anything yet")
+  }
+});
