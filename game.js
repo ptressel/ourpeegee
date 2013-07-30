@@ -5,6 +5,7 @@ var Inventory = require('./inventory');
 var Player = require('./player');
 var Door = require('./door');
 var Item = require('./item');
+var Text = require('./text');
 
 var game = new Game({
   canvasId: 'game',
@@ -21,6 +22,7 @@ game.on('pause', function(){});
 
 game.on('resume', function(){});
 
+var title = new Text({ el: '#title', html: 'this is the new text' });
 
 
 /*
@@ -111,6 +113,21 @@ player.on('draw', function(context){
 
 /*
 *
+* DOOR
+*
+*/
+
+var door = new Door({ position: { x: 100, y: 200 } });
+
+door.on('draw', function(context){
+  context.fillStyle = door.color;
+  context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);    
+});
+
+
+
+/*
+*
 * SCENE MANAGER
 *
 */
@@ -132,6 +149,7 @@ var menu = sceneManager.create({
 
 menu.on('init', function(){
   console.log('this is the menu.');
+  title.update('this is the menu.');
   player.visible = false;
   game.pause();
 });
@@ -154,6 +172,7 @@ var pauseMenu = sceneManager.create({
 
 pauseMenu.on('init', function(){
   console.log('this is the pause menu');
+  title.update('this is the pause menu');
 });
 
 
@@ -169,18 +188,12 @@ var levelOne = sceneManager.create({
   backgroundColor: 'rgb(1,255,155)'
 });
 
-var door = new Door({ position: { x: 100, y: 200 } });
-
-door.on('draw', function(context){
-  context.fillStyle = door.color;
-  context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);    
-});
-
 levelOne.on('init', function(){
-  console.log('this is level one')
+  console.log('this is level one.')
   player.visible = true;
   door.addTo(game);
   pizza.addTo(game);
+  title.update('this is level one.');
 });
 
 levelOne.on('update', function(interval){
@@ -208,7 +221,8 @@ var levelTwo = sceneManager.create({
 });
 
 levelTwo.on('init', function(){
-  console.log('this is level two');
+  console.log('this is level two.');
+  title.update('this is level two.');
   door.position = {
     x: 500,
     y: 100
