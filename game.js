@@ -10,7 +10,7 @@ var Text = require('./text');
 var game = new Game({
   canvasId: 'game',
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight - 100,
   backgroundColor: '#ffffff'
 });
 
@@ -22,7 +22,16 @@ game.on('pause', function(){});
 
 game.on('resume', function(){});
 
-var title = new Text({ el: '#title', html: 'this is the new text' });
+var title = new Text({ 
+  el: '#title',
+  height: '100',
+  styles: { 
+    height: '40px',
+    padding: '30px 0px',
+    margin: '0px',
+    color: '#ff0000'
+  }
+});
 
 
 /*
