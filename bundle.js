@@ -1,4 +1,26 @@
 ;(function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({1:[function(require,module,exports){
+module.exports = Text;
+
+function Text(options){
+  this.el = document.querySelector(options.el);
+
+  for (var style in options.styles){
+    this.el.style[style] = options.styles[style];
+  }
+
+  if (options.html) {
+    this.update(options.html);
+  }
+}
+
+Text.prototype.update = function(html){
+  this.el.innerHTML = html;
+}
+
+Text.prototype.empty = function(){
+  this.el.innerHTML = '';
+}
+},{}],2:[function(require,module,exports){
 var Game = require('crtrdg-gameloop');
 var Keyboard = require('crtrdg-keyboard');
 var SceneManager = require('crtrdg-scene');
@@ -6,11 +28,12 @@ var Inventory = require('./inventory');
 var Player = require('./player');
 var Door = require('./door');
 var Item = require('./item');
+var Text = require('./text');
 
 var game = new Game({
   canvasId: 'game',
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight - 100,
   backgroundColor: '#ffffff'
 });
 
@@ -22,7 +45,15 @@ game.on('pause', function(){});
 
 game.on('resume', function(){});
 
-
+var title = new Text({ 
+  el: '#title',
+  styles: { 
+    height: '40px',
+    padding: '30px 0px',
+    margin: '0px',
+    color: '#ff0000'
+  }
+});
 
 /*
 *
@@ -112,6 +143,21 @@ player.on('draw', function(context){
 
 /*
 *
+* DOOR
+*
+*/
+
+var door = new Door({ position: { x: 100, y: 200 } });
+
+door.on('draw', function(context){
+  context.fillStyle = door.color;
+  context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);    
+});
+
+
+
+/*
+*
 * SCENE MANAGER
 *
 */
@@ -133,6 +179,7 @@ var menu = sceneManager.create({
 
 menu.on('init', function(){
   console.log('this is the menu.');
+  title.update('ourpeegee.');
   player.visible = false;
   game.pause();
 });
@@ -155,6 +202,7 @@ var pauseMenu = sceneManager.create({
 
 pauseMenu.on('init', function(){
   console.log('this is the pause menu');
+  title.update('this is the pause menu');
 });
 
 
@@ -170,18 +218,12 @@ var levelOne = sceneManager.create({
   backgroundColor: 'rgb(1,255,155)'
 });
 
-var door = new Door({ position: { x: 100, y: 200 } });
-
-door.on('draw', function(context){
-  context.fillStyle = door.color;
-  context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);    
-});
-
 levelOne.on('init', function(){
-  console.log('this is level one')
+  console.log('this is level one.')
   player.visible = true;
   door.addTo(game);
   pizza.addTo(game);
+  title.update('find the item and the door.');
 });
 
 levelOne.on('update', function(interval){
@@ -209,13 +251,14 @@ var levelTwo = sceneManager.create({
 });
 
 levelTwo.on('init', function(){
-  console.log('this is level two');
+  console.log('this is level two.');
+  title.update('you are stuck.');
   door.position = {
     x: 500,
     y: 100
   }
 })
-},{"./inventory":2,"./player":3,"./door":4,"./item":5,"crtrdg-gameloop":6,"crtrdg-keyboard":7,"crtrdg-scene":8}],9:[function(require,module,exports){
+},{"./inventory":3,"./player":4,"./door":5,"./item":6,"./text":1,"crtrdg-gameloop":7,"crtrdg-keyboard":8,"crtrdg-scene":9}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -269,7 +312,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function(process){if (!process.EventEmitter) process.EventEmitter = function () {};
 
 var EventEmitter = exports.EventEmitter = process.EventEmitter;
@@ -455,7 +498,7 @@ EventEmitter.prototype.listeners = function(type) {
 };
 
 })(require("__browserify_process"))
-},{"__browserify_process":9}],2:[function(require,module,exports){
+},{"__browserify_process":10}],3:[function(require,module,exports){
 var inherits = require('inherits');
 
 module.exports = Inventory;
@@ -500,7 +543,7 @@ Inventory.prototype.findItem = function(item, callback){
     }
   }
 };
-},{"inherits":11}],3:[function(require,module,exports){
+},{"inherits":12}],4:[function(require,module,exports){
 var inherits = require('inherits');
 var Entity = require('crtrdg-entity');
 
@@ -568,7 +611,7 @@ Player.prototype.input = function(keyboard){
     this.velocity.y = this.speed;
   }
 };
-},{"inherits":11,"crtrdg-entity":12}],4:[function(require,module,exports){
+},{"inherits":12,"crtrdg-entity":13}],5:[function(require,module,exports){
 var inherits = require('inherits');
 var Entity = require('crtrdg-entity');
 
@@ -588,7 +631,7 @@ function Door(options){
 
   this.color = '#999';
 }
-},{"inherits":11,"crtrdg-entity":12}],5:[function(require,module,exports){
+},{"inherits":12,"crtrdg-entity":13}],6:[function(require,module,exports){
 var inherits = require('inherits');
 var Entity = require('crtrdg-entity');
 
@@ -615,7 +658,7 @@ function Item(options){
     context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);   
   });
 }
-},{"inherits":11,"crtrdg-entity":12}],11:[function(require,module,exports){
+},{"inherits":12,"crtrdg-entity":13}],12:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -640,7 +683,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function(){var ua = typeof window !== 'undefined' ? window.navigator.userAgent : ''
   , isOSX = /OS X/.test(ua)
   , isOpera = /Opera/.test(ua)
@@ -779,7 +822,7 @@ for(i = 112; i < 136; ++i) {
 }
 
 })()
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function(){module.exports = raf
 
 var EE = require('events').EventEmitter
@@ -833,7 +876,7 @@ raf.now = now
 
 
 })()
-},{"events":10}],6:[function(require,module,exports){
+},{"events":11}],7:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var requestAnimationFrame = require('raf');
 var inherits = require('inherits');
@@ -905,7 +948,7 @@ Game.prototype.draw = function(){
   this.context.fillRect(0, 0, this.width, this.height);
   this.emit('draw', this.context)
 };
-},{"events":10,"raf":14,"inherits":11}],7:[function(require,module,exports){
+},{"events":11,"raf":15,"inherits":12}],8:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
 var vkey = require('vkey');
@@ -936,7 +979,7 @@ Keyboard.prototype.initializeListeners = function(){
     delete self.keysDown[vkey[e.keyCode]];
   }, false);
 };
-},{"events":10,"vkey":13,"inherits":11}],8:[function(require,module,exports){
+},{"events":11,"vkey":14,"inherits":12}],9:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
 
@@ -1004,7 +1047,7 @@ Scene.prototype.draw = function(context){
   this.emit('draw', context);
 };
 
-},{"events":10,"inherits":11}],12:[function(require,module,exports){
+},{"events":11,"inherits":12}],13:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
 var aabb = require('aabb-2d');
@@ -1086,7 +1129,7 @@ Entity.prototype.setBoundingBox = function(){
   this.boundingBox = aabb([this.position.x, this.position.y], [this.size.x, this.size.y]);  
 };
 
-},{"events":10,"inherits":11,"aabb-2d":15}],15:[function(require,module,exports){
+},{"events":11,"inherits":12,"aabb-2d":16}],16:[function(require,module,exports){
 module.exports = AABB
 
 var vec2 = require('gl-matrix').vec2
@@ -1181,7 +1224,7 @@ proto.union = function(aabb) {
   return new AABB([base_x, base_y], [max_x - base_x, max_y - base_y])
 }
 
-},{"gl-matrix":16}],16:[function(require,module,exports){
+},{"gl-matrix":17}],17:[function(require,module,exports){
 (function(){/**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -4255,5 +4298,5 @@ if(typeof(exports) !== 'undefined') {
 })();
 
 })()
-},{}]},{},[1])
+},{}]},{},[2])
 ;
