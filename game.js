@@ -160,7 +160,7 @@ var menu = sceneManager.create({
 });
 
 menu.on('init', function(){
-  log.add('welcome to ourpeegee')
+  log.add('welcome to ourpeegee. press space to play.')
   title.update('ourpeegee.');
   player.visible = false;
   game.pause();
