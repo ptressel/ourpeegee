@@ -209,12 +209,12 @@ levelOne.on('init', function(){
 });
 
 levelOne.on('update', function(interval){
-  if (player.boundingBox.intersects(door.boundingBox)){
+  if (player.touches(door)){
     log.add('you found the door!');
     sceneManager.set(levelTwo);
   }
 
-  if (player.boundingBox.intersects(pizza.boundingBox)){
+  if (player.touches(pizza)){
     log.add('you found the pizza!');
     pizza.remove();
     inventory.add(pizza);
@@ -244,8 +244,9 @@ levelTwo.on('init', function(){
 });
 
 levelTwo.on('update', function(interval){
-  if (player.boundingBox.intersects(door.boundingBox)){
+  if (player.touches(door)){
     door.remove();
     log.add("yeah, that doesn't do anything yet")
+    console.log(door);
   }
 });
