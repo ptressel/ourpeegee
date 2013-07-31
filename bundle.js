@@ -183,7 +183,7 @@ var menu = sceneManager.create({
 });
 
 menu.on('init', function(){
-  log.add('welcome to ourpeegee')
+  log.add('welcome to ourpeegee. press space to play.')
   title.update('ourpeegee.');
   player.visible = false;
   game.pause();
@@ -206,8 +206,8 @@ var pauseMenu = sceneManager.create({
 });
 
 pauseMenu.on('init', function(){
-  console.log('this is the pause menu');
-  title.update('this is the pause menu');
+  log.add('the game is paused.');
+  title.update('ourpeegee is paused.');
 });
 
 
@@ -232,12 +232,12 @@ levelOne.on('init', function(){
 });
 
 levelOne.on('update', function(interval){
-  if (player.boundingBox.intersects(door.boundingBox)){
+  if (player.touches(door)){
     log.add('you found the door!');
     sceneManager.set(levelTwo);
   }
 
-  if (player.boundingBox.intersects(pizza.boundingBox)){
+  if (player.touches(pizza)){
     log.add('you found the pizza!');
     pizza.remove();
     inventory.add(pizza);
@@ -267,8 +267,10 @@ levelTwo.on('init', function(){
 });
 
 levelTwo.on('update', function(interval){
-  if (player.boundingBox.intersects(door.boundingBox)){
+  if (player.touches(door)){
+    door.remove();
     log.add("yeah, that doesn't do anything yet")
+    console.log(door);
   }
 });
 },{"./inventory":3,"./player":4,"./door":5,"./item":6,"./text":1,"./log":7,"crtrdg-gameloop":8,"crtrdg-keyboard":9,"crtrdg-scene":10}],7:[function(require,module,exports){
@@ -305,556 +307,7 @@ Log.prototype.add = function(html){
 Log.prototype.clear = function(){
   this.el.innerHTML = '';
 }
-},{"./text":1}],3:[function(require,module,exports){
-var inherits = require('inherits');
-
-module.exports = Inventory;
-
-function Inventory(game){
-  this.game = game;
-  this.game.inventory = [];
-}
-
-Inventory.prototype.add = function(item){
-  this.findItem(item, function(exists, items, index){
-    if (!exists){
-      items.push(item);
-    }
-  });
-}
-
-Inventory.prototype.remove = function(item){
-  this.findItem(this, function(exists, items, index){
-    if (exists){
-      items.splice(index, 1);
-    }
-  });
-}
-
-Inventory.prototype.list = function(){
-  return this.game.inventory;
-}
-
-Inventory.prototype.findItem = function(item, callback){
-  var items = this.game.inventory;
-
-  if (items.length === 0){
-    callback(false, items)
-  }
-
-  for (var i=0; i<items.length; i++){
-    if (items[i] === item) {
-      callback(true, items, i);
-    } else {
-      callback(false, items, i);
-    }
-  }
-};
-},{"inherits":11}],4:[function(require,module,exports){
-var inherits = require('inherits');
-var Entity = require('crtrdg-entity');
-
-module.exports = Player;
-inherits(Player, Entity);
-
-function Player(options){
-  this.position = { 
-    x: options.position.x, 
-    y: options.position.y 
-  };
-
-  this.size = {
-    x: options.size.x,
-    y: options.size.y
-  };
-
-  this.velocity = {
-    x: 0,
-    y: 0
-  };
-  
-  this.friction = 0.9;
-  this.speed = options.speed;
-  this.color = options.color;
-}
-
-Player.prototype.move = function(){
-  this.position.x += this.velocity.x;
-  this.position.y += this.velocity.y;
-};
-
-Player.prototype.boundaries = function(){
-  if (this.position.x <= 0){
-    this.position.x = 0;
-  }
-
-  if (this.position.x >= this.game.width - this.size.x){
-    this.position.x = this.game.width - this.size.x;
-  }
-
-  if (this.position.y <= 0){
-    this.position.y = 0;
-  }
-
-  if (this.position.y >= this.game.height - this.size.y){
-    this.position.y = this.game.height - this.size.y;
-  }
-};
-
-Player.prototype.input = function(keyboard){
-  if ('A' in keyboard.keysDown){
-    this.velocity.x = -this.speed;
-  }
-
-  if ('D' in keyboard.keysDown){
-    this.velocity.x = this.speed;
-  }
-
-  if ('W' in keyboard.keysDown){
-    this.velocity.y = -this.speed;
-  }
-
-  if ('S' in keyboard.keysDown){
-    this.velocity.y = this.speed;
-  }
-};
-},{"inherits":11,"crtrdg-entity":12}],5:[function(require,module,exports){
-var inherits = require('inherits');
-var Entity = require('crtrdg-entity');
-
-module.exports = Door;
-inherits(Door, Entity);
-
-function Door(options){
-  this.position = {
-    x: options.position.x,
-    y: options.position.y
-  };
-
-  this.size = {
-    x: 20,
-    y: 40
-  };
-
-  this.color = '#999';
-}
-},{"inherits":11,"crtrdg-entity":12}],6:[function(require,module,exports){
-var inherits = require('inherits');
-var Entity = require('crtrdg-entity');
-
-module.exports = Item;
-inherits(Item, Entity);
-
-function Item(options){
-  this.name = options.name;
-
-  this.position = {
-    x: options.position.x,
-    y: options.position.y
-  };
-
-  this.size = {
-    x: 5,
-    y: 5
-  };
-
-  this.color = '#fff111';
-
-  this.on('draw', function(context){
-    context.fillStyle = this.color;
-    context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);   
-  });
-}
-},{"inherits":11,"crtrdg-entity":12}],11:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],13:[function(require,module,exports){
-(function(){var ua = typeof window !== 'undefined' ? window.navigator.userAgent : ''
-  , isOSX = /OS X/.test(ua)
-  , isOpera = /Opera/.test(ua)
-  , maybeFirefox = !/like Gecko/.test(ua) && !isOpera
-
-var i, output = module.exports = {
-  0:  isOSX ? '<menu>' : '<UNK>'
-, 1:  '<mouse 1>'
-, 2:  '<mouse 2>'
-, 3:  '<break>'
-, 4:  '<mouse 3>'
-, 5:  '<mouse 4>'
-, 6:  '<mouse 5>'
-, 8:  '<backspace>'
-, 9:  '<tab>'
-, 12: '<clear>'
-, 13: '<enter>'
-, 16: '<shift>'
-, 17: '<control>'
-, 18: '<alt>'
-, 19: '<pause>'
-, 20: '<caps-lock>'
-, 21: '<ime-hangul>'
-, 23: '<ime-junja>'
-, 24: '<ime-final>'
-, 25: '<ime-kanji>'
-, 27: '<escape>'
-, 28: '<ime-convert>'
-, 29: '<ime-nonconvert>'
-, 30: '<ime-accept>'
-, 31: '<ime-mode-change>'
-, 27: '<escape>'
-, 32: '<space>'
-, 33: '<page-up>'
-, 34: '<page-down>'
-, 35: '<end>'
-, 36: '<home>'
-, 37: '<left>'
-, 38: '<up>'
-, 39: '<right>'
-, 40: '<down>'
-, 41: '<select>'
-, 42: '<print>'
-, 43: '<execute>'
-, 44: '<snapshot>'
-, 45: '<insert>'
-, 46: '<delete>'
-, 47: '<help>'
-, 91: '<meta>'  // meta-left -- no one handles left and right properly, so we coerce into one.
-, 92: '<meta>'  // meta-right
-, 93: isOSX ? '<meta>' : '<menu>'      // chrome,opera,safari all report this for meta-right (osx mbp).
-, 95: '<sleep>'
-, 106: '<num-*>'
-, 107: '<num-+>'
-, 108: '<num-enter>'
-, 109: '<num-->'
-, 110: '<num-.>'
-, 111: '<num-/>'
-, 144: '<num-lock>'
-, 145: '<scroll-lock>'
-, 160: '<shift-left>'
-, 161: '<shift-right>'
-, 162: '<control-left>'
-, 163: '<control-right>'
-, 164: '<alt-left>'
-, 165: '<alt-right>'
-, 166: '<browser-back>'
-, 167: '<browser-forward>'
-, 168: '<browser-refresh>'
-, 169: '<browser-stop>'
-, 170: '<browser-search>'
-, 171: '<browser-favorites>'
-, 172: '<browser-home>'
-
-  // ff/osx reports '<volume-mute>' for '-'
-, 173: isOSX && maybeFirefox ? '-' : '<volume-mute>'
-, 174: '<volume-down>'
-, 175: '<volume-up>'
-, 176: '<next-track>'
-, 177: '<prev-track>'
-, 178: '<stop>'
-, 179: '<play-pause>'
-, 180: '<launch-mail>'
-, 181: '<launch-media-select>'
-, 182: '<launch-app 1>'
-, 183: '<launch-app 2>'
-, 186: ';'
-, 187: '='
-, 188: ','
-, 189: '-'
-, 190: '.'
-, 191: '/'
-, 192: '`'
-, 219: '['
-, 220: '\\'
-, 221: ']'
-, 222: "'"
-, 223: '<meta>'
-, 224: '<meta>'       // firefox reports meta here.
-, 226: '<alt-gr>'
-, 229: '<ime-process>'
-, 231: isOpera ? '`' : '<unicode>'
-, 246: '<attention>'
-, 247: '<crsel>'
-, 248: '<exsel>'
-, 249: '<erase-eof>'
-, 250: '<play>'
-, 251: '<zoom>'
-, 252: '<no-name>'
-, 253: '<pa-1>'
-, 254: '<clear>'
-}
-
-for(i = 58; i < 65; ++i) {
-  output[i] = String.fromCharCode(i)
-}
-
-// 0-9
-for(i = 48; i < 58; ++i) {
-  output[i] = (i - 48)+''
-}
-
-// A-Z
-for(i = 65; i < 91; ++i) {
-  output[i] = String.fromCharCode(i)
-}
-
-// num0-9
-for(i = 96; i < 107; ++i) {
-  output[i] = '<num-'+(i - 96)+'>'
-}
-
-// F1-F24
-for(i = 112; i < 136; ++i) {
-  output[i] = 'F'+(i-111)
-}
-
-})()
-},{}],14:[function(require,module,exports){
-(function(){module.exports = raf
-
-var EE = require('events').EventEmitter
-  , global = typeof window === 'undefined' ? this : window
-  , now = global.performance && global.performance.now ? function() {
-    return performance.now()
-  } : Date.now || function () {
-    return +new Date()
-  }
-
-var _raf =
-  global.requestAnimationFrame ||
-  global.webkitRequestAnimationFrame ||
-  global.mozRequestAnimationFrame ||
-  global.msRequestAnimationFrame ||
-  global.oRequestAnimationFrame ||
-  (global.setImmediate ? function(fn, el) {
-    setImmediate(fn)
-  } :
-  function(fn, el) {
-    setTimeout(fn, 0)
-  })
-
-function raf(el) {
-  var now = raf.now()
-    , ee = new EE
-
-  ee.pause = function() { ee.paused = true }
-  ee.resume = function() { ee.paused = false }
-
-  _raf(iter, el)
-
-  return ee
-
-  function iter(timestamp) {
-    var _now = raf.now()
-      , dt = _now - now
-    
-    now = _now
-
-    ee.emit('data', dt)
-
-    if(!ee.paused) {
-      _raf(iter, el)
-    }
-  }
-}
-
-raf.polyfill = _raf
-raf.now = now
-
-
-})()
-},{"events":15}],8:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter;
-var requestAnimationFrame = require('raf');
-var inherits = require('inherits');
-
-module.exports = Game;
-inherits(Game, EventEmitter);
-
-function Game(options){
-  this.canvas = document.getElementById(options.canvasId);
-  this.context = this.canvas.getContext('2d');
-  this.width = this.canvas.width = options.width;
-  this.height = this.canvas.height = options.height;
-  this.backgroundColor = options.backgroundColor;
-  this.paused = false;
-
-  if (options.maxListeners){
-    this.setMaxListeners(options.maxListeners);
-  } else {
-    this.setMaxListeners(0);
-  }
-
-  this.loop();
-}
-
-Game.prototype.loop = function(){
-  var self = this;
-
-  this.ticker = requestAnimationFrame(this.canvas);
-  this.ticker.on('data', function(interval) {
-    self.update(interval);
-    self.draw();
-  });
-};
-
-Game.prototype.pause = function(){
-  this.paused = true;
-  this.ticker.pause();
-  this.emit('pause');
-};
-
-Game.prototype.resume = function(){
-  var self = this;
-  
-  this.paused = false;
-  this.ticker = requestAnimationFrame(this.canvas);
-  this.ticker.on('data', function(interval) {
-    self.update(interval);
-    self.draw();
-  });
-
-  this.emit('resume');
-};
-
-Game.prototype.update = function(interval){
-  if (this.currentScene){
-    this.sceneManager.update(interval);
-  }
-  this.emit('update', interval);
-};
-
-Game.prototype.draw = function(){
-  if (this.currentScene){
-    this.context.fillStyle = this.currentScene.backgroundColor;
-    this.sceneManager.draw(this.context);
-
-  } else {
-    this.context.fillStyle = this.backgroundColor;
-  }
-  this.context.fillRect(0, 0, this.width, this.height);
-  this.emit('draw', this.context)
-};
-},{"events":15,"raf":14,"inherits":11}],9:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter;
-var inherits = require('inherits');
-var vkey = require('vkey');
-
-module.exports = Keyboard;
-inherits(Keyboard, EventEmitter);
-
-function Keyboard(game){
-  this.game = game || {};
-  this.keysDown = {};
-  this.initializeListeners();
-}
-
-Keyboard.prototype.initializeListeners = function(){
-  var self = this;
-
-  document.addEventListener('keydown', function(e){
-    self.emit('keydown', vkey[e.keyCode]);
-    self.keysDown[vkey[e.keyCode]] = true;
-
-    if (e.keyCode === 40 || e.keyCode === 38 || e.keyCode === 37 || e.keyCode === 39 || e.keyCode === 32) {
-      e.preventDefault();
-    }
-  }, false);
-
-  document.addEventListener('keyup', function(e){
-    self.emit('keyup', vkey[e.keyCode]);
-    delete self.keysDown[vkey[e.keyCode]];
-  }, false);
-};
-},{"events":15,"vkey":13,"inherits":11}],10:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter;
-var inherits = require('inherits');
-
-module.exports = SceneManager;
-
-function SceneManager(game){
-  this.game = game || {};
-  this.game.scenes = [];
-  this.game.sceneManager = this;
-  this.game.currentScene = null;
-  this.game.previousScene = null;
-
-  return this;
-};
-
-SceneManager.prototype.add = function(scene){
-  this.game.scenes.push(scene);
-
-  return this;
-};
-
-SceneManager.prototype.create = function(options){
-  var scene = new Scene(options);
-  this.add(scene);
-  return scene;
-};
-
-SceneManager.prototype.set = function(scene){
-  this.game.currentScene = scene;
-  scene.emit('init');
-};
-
-SceneManager.prototype.get = function(sceneName){
-  for (var i=0; i<this.game.scenes.length; i++){
-    if (this.game.scenes[i].name === sceneName) {
-      return this.game.scenes[i];
-    }
-  }
-};
-
-SceneManager.prototype.update = function(interval){
-  this.game.currentScene.update(interval);
-};
-
-SceneManager.prototype.draw = function(context){
-  this.game.currentScene.draw(context);
-};
-
-
-exports.Scene = Scene;
-inherits(Scene, EventEmitter);
-
-function Scene(options){
-  this.name = options.name;
-  this.backgroundColor = options.backgroundColor;
-
-  return this;
-}
-
-Scene.prototype.update = function(interval){
-  this.emit('update', interval)
-};
-
-Scene.prototype.draw = function(context){
-  this.emit('draw', context);
-};
-
-},{"events":15,"inherits":11}],16:[function(require,module,exports){
+},{"./text":1}],11:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -908,7 +361,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],15:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function(process){if (!process.EventEmitter) process.EventEmitter = function () {};
 
 var EventEmitter = exports.EventEmitter = process.EventEmitter;
@@ -1094,7 +547,556 @@ EventEmitter.prototype.listeners = function(type) {
 };
 
 })(require("__browserify_process"))
-},{"__browserify_process":16}],12:[function(require,module,exports){
+},{"__browserify_process":11}],3:[function(require,module,exports){
+var inherits = require('inherits');
+
+module.exports = Inventory;
+
+function Inventory(game){
+  this.game = game;
+  this.game.inventory = [];
+}
+
+Inventory.prototype.add = function(item){
+  this.findItem(item, function(exists, items, index){
+    if (!exists){
+      items.push(item);
+    }
+  });
+}
+
+Inventory.prototype.remove = function(item){
+  this.findItem(this, function(exists, items, index){
+    if (exists){
+      items.splice(index, 1);
+    }
+  });
+}
+
+Inventory.prototype.list = function(){
+  return this.game.inventory;
+}
+
+Inventory.prototype.findItem = function(item, callback){
+  var items = this.game.inventory;
+
+  if (items.length === 0){
+    callback(false, items)
+  }
+
+  for (var i=0; i<items.length; i++){
+    if (items[i] === item) {
+      callback(true, items, i);
+    } else {
+      callback(false, items, i);
+    }
+  }
+};
+},{"inherits":13}],4:[function(require,module,exports){
+var inherits = require('inherits');
+var Entity = require('crtrdg-entity');
+
+module.exports = Player;
+inherits(Player, Entity);
+
+function Player(options){
+  this.position = { 
+    x: options.position.x, 
+    y: options.position.y 
+  };
+
+  this.size = {
+    x: options.size.x,
+    y: options.size.y
+  };
+
+  this.velocity = {
+    x: 0,
+    y: 0
+  };
+  
+  this.friction = 0.9;
+  this.speed = options.speed;
+  this.color = options.color;
+}
+
+Player.prototype.move = function(){
+  this.position.x += this.velocity.x;
+  this.position.y += this.velocity.y;
+};
+
+Player.prototype.boundaries = function(){
+  if (this.position.x <= 0){
+    this.position.x = 0;
+  }
+
+  if (this.position.x >= this.game.width - this.size.x){
+    this.position.x = this.game.width - this.size.x;
+  }
+
+  if (this.position.y <= 0){
+    this.position.y = 0;
+  }
+
+  if (this.position.y >= this.game.height - this.size.y){
+    this.position.y = this.game.height - this.size.y;
+  }
+};
+
+Player.prototype.input = function(keyboard){
+  if ('A' in keyboard.keysDown){
+    this.velocity.x = -this.speed;
+  }
+
+  if ('D' in keyboard.keysDown){
+    this.velocity.x = this.speed;
+  }
+
+  if ('W' in keyboard.keysDown){
+    this.velocity.y = -this.speed;
+  }
+
+  if ('S' in keyboard.keysDown){
+    this.velocity.y = this.speed;
+  }
+};
+},{"inherits":13,"crtrdg-entity":14}],5:[function(require,module,exports){
+var inherits = require('inherits');
+var Entity = require('crtrdg-entity');
+
+module.exports = Door;
+inherits(Door, Entity);
+
+function Door(options){
+  this.position = {
+    x: options.position.x,
+    y: options.position.y
+  };
+
+  this.size = {
+    x: 20,
+    y: 40
+  };
+
+  this.color = '#999';
+}
+},{"inherits":13,"crtrdg-entity":14}],6:[function(require,module,exports){
+var inherits = require('inherits');
+var Entity = require('crtrdg-entity');
+
+module.exports = Item;
+inherits(Item, Entity);
+
+function Item(options){
+  this.name = options.name;
+
+  this.position = {
+    x: options.position.x,
+    y: options.position.y
+  };
+
+  this.size = {
+    x: 5,
+    y: 5
+  };
+
+  this.color = '#fff111';
+
+  this.on('draw', function(context){
+    context.fillStyle = this.color;
+    context.fillRect(this.position.x, this.position.y, this.size.x, this.size.y);   
+  });
+}
+},{"inherits":13,"crtrdg-entity":14}],13:[function(require,module,exports){
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+},{}],15:[function(require,module,exports){
+(function(){var ua = typeof window !== 'undefined' ? window.navigator.userAgent : ''
+  , isOSX = /OS X/.test(ua)
+  , isOpera = /Opera/.test(ua)
+  , maybeFirefox = !/like Gecko/.test(ua) && !isOpera
+
+var i, output = module.exports = {
+  0:  isOSX ? '<menu>' : '<UNK>'
+, 1:  '<mouse 1>'
+, 2:  '<mouse 2>'
+, 3:  '<break>'
+, 4:  '<mouse 3>'
+, 5:  '<mouse 4>'
+, 6:  '<mouse 5>'
+, 8:  '<backspace>'
+, 9:  '<tab>'
+, 12: '<clear>'
+, 13: '<enter>'
+, 16: '<shift>'
+, 17: '<control>'
+, 18: '<alt>'
+, 19: '<pause>'
+, 20: '<caps-lock>'
+, 21: '<ime-hangul>'
+, 23: '<ime-junja>'
+, 24: '<ime-final>'
+, 25: '<ime-kanji>'
+, 27: '<escape>'
+, 28: '<ime-convert>'
+, 29: '<ime-nonconvert>'
+, 30: '<ime-accept>'
+, 31: '<ime-mode-change>'
+, 27: '<escape>'
+, 32: '<space>'
+, 33: '<page-up>'
+, 34: '<page-down>'
+, 35: '<end>'
+, 36: '<home>'
+, 37: '<left>'
+, 38: '<up>'
+, 39: '<right>'
+, 40: '<down>'
+, 41: '<select>'
+, 42: '<print>'
+, 43: '<execute>'
+, 44: '<snapshot>'
+, 45: '<insert>'
+, 46: '<delete>'
+, 47: '<help>'
+, 91: '<meta>'  // meta-left -- no one handles left and right properly, so we coerce into one.
+, 92: '<meta>'  // meta-right
+, 93: isOSX ? '<meta>' : '<menu>'      // chrome,opera,safari all report this for meta-right (osx mbp).
+, 95: '<sleep>'
+, 106: '<num-*>'
+, 107: '<num-+>'
+, 108: '<num-enter>'
+, 109: '<num-->'
+, 110: '<num-.>'
+, 111: '<num-/>'
+, 144: '<num-lock>'
+, 145: '<scroll-lock>'
+, 160: '<shift-left>'
+, 161: '<shift-right>'
+, 162: '<control-left>'
+, 163: '<control-right>'
+, 164: '<alt-left>'
+, 165: '<alt-right>'
+, 166: '<browser-back>'
+, 167: '<browser-forward>'
+, 168: '<browser-refresh>'
+, 169: '<browser-stop>'
+, 170: '<browser-search>'
+, 171: '<browser-favorites>'
+, 172: '<browser-home>'
+
+  // ff/osx reports '<volume-mute>' for '-'
+, 173: isOSX && maybeFirefox ? '-' : '<volume-mute>'
+, 174: '<volume-down>'
+, 175: '<volume-up>'
+, 176: '<next-track>'
+, 177: '<prev-track>'
+, 178: '<stop>'
+, 179: '<play-pause>'
+, 180: '<launch-mail>'
+, 181: '<launch-media-select>'
+, 182: '<launch-app 1>'
+, 183: '<launch-app 2>'
+, 186: ';'
+, 187: '='
+, 188: ','
+, 189: '-'
+, 190: '.'
+, 191: '/'
+, 192: '`'
+, 219: '['
+, 220: '\\'
+, 221: ']'
+, 222: "'"
+, 223: '<meta>'
+, 224: '<meta>'       // firefox reports meta here.
+, 226: '<alt-gr>'
+, 229: '<ime-process>'
+, 231: isOpera ? '`' : '<unicode>'
+, 246: '<attention>'
+, 247: '<crsel>'
+, 248: '<exsel>'
+, 249: '<erase-eof>'
+, 250: '<play>'
+, 251: '<zoom>'
+, 252: '<no-name>'
+, 253: '<pa-1>'
+, 254: '<clear>'
+}
+
+for(i = 58; i < 65; ++i) {
+  output[i] = String.fromCharCode(i)
+}
+
+// 0-9
+for(i = 48; i < 58; ++i) {
+  output[i] = (i - 48)+''
+}
+
+// A-Z
+for(i = 65; i < 91; ++i) {
+  output[i] = String.fromCharCode(i)
+}
+
+// num0-9
+for(i = 96; i < 107; ++i) {
+  output[i] = '<num-'+(i - 96)+'>'
+}
+
+// F1-F24
+for(i = 112; i < 136; ++i) {
+  output[i] = 'F'+(i-111)
+}
+
+})()
+},{}],16:[function(require,module,exports){
+(function(){module.exports = raf
+
+var EE = require('events').EventEmitter
+  , global = typeof window === 'undefined' ? this : window
+  , now = global.performance && global.performance.now ? function() {
+    return performance.now()
+  } : Date.now || function () {
+    return +new Date()
+  }
+
+var _raf =
+  global.requestAnimationFrame ||
+  global.webkitRequestAnimationFrame ||
+  global.mozRequestAnimationFrame ||
+  global.msRequestAnimationFrame ||
+  global.oRequestAnimationFrame ||
+  (global.setImmediate ? function(fn, el) {
+    setImmediate(fn)
+  } :
+  function(fn, el) {
+    setTimeout(fn, 0)
+  })
+
+function raf(el) {
+  var now = raf.now()
+    , ee = new EE
+
+  ee.pause = function() { ee.paused = true }
+  ee.resume = function() { ee.paused = false }
+
+  _raf(iter, el)
+
+  return ee
+
+  function iter(timestamp) {
+    var _now = raf.now()
+      , dt = _now - now
+    
+    now = _now
+
+    ee.emit('data', dt)
+
+    if(!ee.paused) {
+      _raf(iter, el)
+    }
+  }
+}
+
+raf.polyfill = _raf
+raf.now = now
+
+
+})()
+},{"events":12}],8:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter;
+var requestAnimationFrame = require('raf');
+var inherits = require('inherits');
+
+module.exports = Game;
+inherits(Game, EventEmitter);
+
+function Game(options){
+  this.canvas = document.getElementById(options.canvasId);
+  this.context = this.canvas.getContext('2d');
+  this.width = this.canvas.width = options.width;
+  this.height = this.canvas.height = options.height;
+  this.backgroundColor = options.backgroundColor;
+  this.paused = false;
+
+  if (options.maxListeners){
+    this.setMaxListeners(options.maxListeners);
+  } else {
+    this.setMaxListeners(0);
+  }
+
+  this.loop();
+}
+
+Game.prototype.loop = function(){
+  var self = this;
+
+  this.ticker = requestAnimationFrame(this.canvas);
+  this.ticker.on('data', function(interval) {
+    self.update(interval);
+    self.draw();
+  });
+};
+
+Game.prototype.pause = function(){
+  this.paused = true;
+  this.ticker.pause();
+  this.emit('pause');
+};
+
+Game.prototype.resume = function(){
+  var self = this;
+  
+  this.paused = false;
+  this.ticker = requestAnimationFrame(this.canvas);
+  this.ticker.on('data', function(interval) {
+    self.update(interval);
+    self.draw();
+  });
+
+  this.emit('resume');
+};
+
+Game.prototype.update = function(interval){
+  if (this.currentScene){
+    this.sceneManager.update(interval);
+  }
+  this.emit('update', interval);
+};
+
+Game.prototype.draw = function(){
+  if (this.currentScene){
+    this.context.fillStyle = this.currentScene.backgroundColor;
+    this.sceneManager.draw(this.context);
+
+  } else {
+    this.context.fillStyle = this.backgroundColor;
+  }
+  this.context.fillRect(0, 0, this.width, this.height);
+  this.emit('draw', this.context)
+};
+},{"events":12,"raf":16,"inherits":13}],9:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('inherits');
+var vkey = require('vkey');
+
+module.exports = Keyboard;
+inherits(Keyboard, EventEmitter);
+
+function Keyboard(game){
+  this.game = game || {};
+  this.keysDown = {};
+  this.initializeListeners();
+}
+
+Keyboard.prototype.initializeListeners = function(){
+  var self = this;
+
+  document.addEventListener('keydown', function(e){
+    self.emit('keydown', vkey[e.keyCode]);
+    self.keysDown[vkey[e.keyCode]] = true;
+
+    if (e.keyCode === 40 || e.keyCode === 38 || e.keyCode === 37 || e.keyCode === 39 || e.keyCode === 32) {
+      e.preventDefault();
+    }
+  }, false);
+
+  document.addEventListener('keyup', function(e){
+    self.emit('keyup', vkey[e.keyCode]);
+    delete self.keysDown[vkey[e.keyCode]];
+  }, false);
+};
+},{"events":12,"vkey":15,"inherits":13}],10:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter;
+var inherits = require('inherits');
+
+module.exports = SceneManager;
+
+function SceneManager(game){
+  this.game = game || {};
+  this.game.scenes = [];
+  this.game.sceneManager = this;
+  this.game.currentScene = null;
+  this.game.previousScene = null;
+
+  return this;
+};
+
+SceneManager.prototype.add = function(scene){
+  this.game.scenes.push(scene);
+
+  return this;
+};
+
+SceneManager.prototype.create = function(options){
+  var scene = new Scene(options);
+  this.add(scene);
+  return scene;
+};
+
+SceneManager.prototype.set = function(scene){
+  this.game.currentScene = scene;
+  scene.emit('init');
+};
+
+SceneManager.prototype.get = function(sceneName){
+  for (var i=0; i<this.game.scenes.length; i++){
+    if (this.game.scenes[i].name === sceneName) {
+      return this.game.scenes[i];
+    }
+  }
+};
+
+SceneManager.prototype.update = function(interval){
+  this.game.currentScene.update(interval);
+};
+
+SceneManager.prototype.draw = function(context){
+  this.game.currentScene.draw(context);
+};
+
+
+exports.Scene = Scene;
+inherits(Scene, EventEmitter);
+
+function Scene(options){
+  this.name = options.name;
+  this.backgroundColor = options.backgroundColor;
+
+  return this;
+}
+
+Scene.prototype.update = function(interval){
+  this.emit('update', interval)
+};
+
+Scene.prototype.draw = function(context){
+  this.emit('draw', context);
+};
+
+},{"events":12,"inherits":13}],14:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
 var aabb = require('aabb-2d');
@@ -1172,11 +1174,20 @@ Entity.prototype.findEntity = function(entity, callback){
   }
 };
 
+Entity.prototype.touches = function(entity){
+  if (entity.exists){
+    return this.boundingBox.intersects(entity.boundingBox);
+  }
+  else {
+    return false;
+  }
+}
+
 Entity.prototype.setBoundingBox = function(){
   this.boundingBox = aabb([this.position.x, this.position.y], [this.size.x, this.size.y]);  
 };
 
-},{"events":15,"inherits":11,"aabb-2d":17}],17:[function(require,module,exports){
+},{"events":12,"inherits":13,"aabb-2d":17}],17:[function(require,module,exports){
 module.exports = AABB
 
 var vec2 = require('gl-matrix').vec2
