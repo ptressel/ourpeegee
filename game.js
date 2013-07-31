@@ -245,6 +245,7 @@ levelTwo.on('init', function(){
 
 levelTwo.on('update', function(interval){
   if (player.boundingBox.intersects(door.boundingBox)){
+    door.remove();
     log.add("yeah, that doesn't do anything yet")
   }
 });
