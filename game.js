@@ -183,8 +183,8 @@ var pauseMenu = sceneManager.create({
 });
 
 pauseMenu.on('init', function(){
-  console.log('this is the pause menu');
-  title.update('this is the pause menu');
+  log.add('the game is paused.');
+  title.update('ourpeegee is paused.');
 });
 
 
