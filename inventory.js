@@ -15,7 +15,7 @@ Inventory.prototype.add = function(item){
   });
 };
 
-Inventory.prototype.remove = function(item){
+Inventory.prototype.remove = function(){
   this.findItem(this, function(exists, items, index){
     if (exists){
       items.splice(index, 1);
@@ -24,10 +24,14 @@ Inventory.prototype.remove = function(item){
 };
 
 Inventory.prototype.list = function(){
-  return this.game.inventory;
+  return this.game.inventory.join(', ');
 };
 
 Inventory.prototype.findItem = function(itemToFind, callback){
+  if (this.game.inventory.length === 0){
+    callback(false, this.game.inventory);
+  }
+
   this.each(function(item, i, items){
     if (itemToFind === item){
       callback(true, items, i);
@@ -48,9 +52,7 @@ Inventory.prototype.createHTML = function(){
 };
 
 Inventory.prototype.each = function(callback){
-  var items = this.game.inventory;
-
-  for (var i=0; i<items.length; i++){
-    callback(items[i], i, items);
+  for (var i=0; i<this.game.inventory.length; i++){
+    callback(this.game.inventory[i], i, this.game.inventory);
   }
 };

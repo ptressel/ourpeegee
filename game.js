@@ -53,8 +53,6 @@ var pizza = new Item({
   }
 });
 
-inventory.createHTML();
-
 
 /*
 *
@@ -220,7 +218,7 @@ levelOne.on('update', function(interval){
     log.add('you found the pizza!');
     pizza.remove();
     inventory.add(pizza);
-    inventory.display();
+    console.log(game.inventory)
   }
 });
 
@@ -249,7 +247,6 @@ levelTwo.on('init', function(){
 levelTwo.on('update', function(interval){
   if (player.touches(door)){
     door.remove();
-    log.add("yeah, that doesn't do anything yet")
-    console.log(door);
+    log.add("yeah, that doesn't do anything yet.")
   }
 });
