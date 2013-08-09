@@ -29,7 +29,7 @@ Inventory.prototype.list = function(){
 
 Inventory.prototype.findItem = function(itemToFind, callback){
   if (this.game.inventory.length === 0){
-    callback(false, this.game.inventory);
+    callback(false, this.game.inventory, null);
   }
 
   this.each(function(item, i, items){
