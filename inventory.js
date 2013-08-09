@@ -13,7 +13,7 @@ Inventory.prototype.add = function(item){
       items.push(item);
     }
   });
-}
+};
 
 Inventory.prototype.remove = function(item){
   this.findItem(this, function(exists, items, index){
@@ -21,24 +21,36 @@ Inventory.prototype.remove = function(item){
       items.splice(index, 1);
     }
   });
-}
+};
 
 Inventory.prototype.list = function(){
   return this.game.inventory;
-}
+};
 
-Inventory.prototype.findItem = function(item, callback){
-  var items = this.game.inventory;
-
-  if (items.length === 0){
-    callback(false, items)
-  }
-
-  for (var i=0; i<items.length; i++){
-    if (items[i] === item) {
+Inventory.prototype.findItem = function(itemToFind, callback){
+  this.each(function(item, i, items){
+    if (itemToFind === item){
       callback(true, items, i);
     } else {
       callback(false, items, i);
     }
+  });
+};
+
+Inventory.prototype.display = function(el){
+  this.createHTML();
+};
+
+Inventory.prototype.createHTML = function(){
+  this.each(function(item, i, items){
+    console.log(item);
+  });
+};
+
+Inventory.prototype.each = function(callback){
+  var items = this.game.inventory;
+
+  for (var i=0; i<items.length; i++){
+    callback(items[i], i, items);
   }
 };

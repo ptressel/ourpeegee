@@ -53,6 +53,8 @@ var pizza = new Item({
   }
 });
 
+inventory.createHTML();
+
 
 /*
 *
@@ -218,6 +220,7 @@ levelOne.on('update', function(interval){
     log.add('you found the pizza!');
     pizza.remove();
     inventory.add(pizza);
+    inventory.display();
   }
 });
 
