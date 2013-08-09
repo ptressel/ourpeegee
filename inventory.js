@@ -46,8 +46,13 @@ Inventory.prototype.display = function(el){
 };
 
 Inventory.prototype.createHTML = function(){
+  var ul = document.createElement('ul');
   this.each(function(item, i, items){
-    console.log(item);
+    var li = document.createElement('li');
+    li.innerHTML = item.name;
+    li.id = item.name;
+    ul.appendChild(li);
+    console.log(ul);
   });
 };
 

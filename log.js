@@ -4,7 +4,6 @@ module.exports = Log;
 
 function Log(options){
   this.el = document.createElement('ul');
-  this.add('...');
 
   var body = document.querySelector('body');
   body.appendChild(this.el);
@@ -26,8 +25,8 @@ Log.prototype.add = function(html){
   item.style.listStyleType = 'none';
   this.el.appendChild(item);
   this.el.scrollTop = this.el.scrollHeight;
-}
+};
 
 Log.prototype.clear = function(){
   this.el.innerHTML = '';
-}
+};

@@ -53,7 +53,6 @@ var pizza = new Item({
   }
 });
 
-
 /*
 *
 * KEYBOARD
@@ -219,6 +218,7 @@ levelOne.on('update', function(interval){
     pizza.remove();
     inventory.add(pizza);
     console.log(game.inventory)
+    inventory.display();
   }
 });
 
