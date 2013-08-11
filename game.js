@@ -170,7 +170,7 @@ var menu = sceneManager.create({
   backgroundColor: '#ffffff'
 });
 
-menu.on('init', function(){
+menu.on('start', function(){
   log.add('welcome to ourpeegee. press space to play.')
   title.update('ourpeegee.');
   player.visible = false;
@@ -193,7 +193,7 @@ var pauseMenu = sceneManager.create({
   backgroundColor: 'blue'
 });
 
-pauseMenu.on('init', function(){
+pauseMenu.on('start', function(){
   log.add('the game is paused.');
   title.update('ourpeegee is paused.');
 });
@@ -211,7 +211,7 @@ var levelOne = sceneManager.create({
   backgroundColor: 'rgb(1,255,155)'
 });
 
-levelOne.on('init', function(){
+levelOne.on('start', function(){
   log.add('level one is the best level so far.')
   player.visible = true;
   door.addTo(game);
@@ -259,7 +259,7 @@ var levelTwo = sceneManager.create({
   backgroundColor: 'rgb(111, 42, 237)'
 });
 
-levelTwo.on('init', function(){
+levelTwo.on('start', function(){
   log.add('level two is the last level. lame, right?');
   title.update('you are stuck.');
   door.position = {
