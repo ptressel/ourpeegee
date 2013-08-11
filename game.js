@@ -228,7 +228,7 @@ levelOne.on('update', function(interval){
   }
 
   if (player.touches(pizza)){
-    log.add('you found pizza!');
+    log.add('you found pizza, now you can open the door!');
     pizza.remove();
     inventory.add(pizza);
   }
