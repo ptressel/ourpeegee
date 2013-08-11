@@ -34,7 +34,7 @@ Inventory.prototype.add = function(item){
   var self = this;
 
   this.findItem(item.name, function(exists, items){
-    console.log(exists, items)
+
     if (exists === false){
 
       items[item.name] = {
@@ -80,7 +80,6 @@ Inventory.prototype.findItem = function(itemNameToFind, callback){
   }
 
   this.each(function(item, items){
-    console.log(itemNameToFind, item)
     if (itemNameToFind === item){
       return callback(true, items);
     } else {
@@ -91,7 +90,6 @@ Inventory.prototype.findItem = function(itemNameToFind, callback){
 
 Inventory.prototype.hasItem = function hasItem(itemName, callback){
   this.findItem(itemName, function(exists, items){
-    console.log(exists)
     if (exists){
       return callback(true);
     } else {
