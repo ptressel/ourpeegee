@@ -6,19 +6,17 @@ function Inventory(game){
   this.game = game;
   this.game.inventory = {};
 
-  console.log(this.game.inventory.length)
-
   this.createHTML();
 
   var self = this;
 
   this.game.on('update', function(interval){
-    if (this.inventory.length > 0){
+    if (self.isEmpty() === false){
       self.el.style.display = 'block';
     } else {
       self.el.style.display = 'none';
     }
-  })
+  });
 }
 
 Inventory.prototype.createHTML = function(){
@@ -30,13 +28,12 @@ Inventory.prototype.createHTML = function(){
   this.el.appendChild(h3);
 
   document.body.appendChild(this.el);
-
 };
 
 Inventory.prototype.add = function(item){
   var self = this;
 
-  this.findItem(item, function(exists, items){
+  this.findItem(item.name, function(exists, items){
     console.log(exists, items)
     if (exists === false){
 
@@ -51,16 +48,24 @@ Inventory.prototype.add = function(item){
       self.el.appendChild(li);
 
     } else {
-      items[items.name].quantity += 1;
+      items[item.name].quantity += 1;
     }
 
   });
 };
 
-Inventory.prototype.remove = function(){
-  this.findItem(this, function(exists, items, index){
+Inventory.prototype.remove = function(item){
+  var self = this;
+
+  this.findItem(item.name, function(exists, items){
     if (exists){
-      //items.splice(index, 1);
+      if (items[item.name].quantity > 1){
+        items[item.name].quantity -= 1;
+      } else {
+        delete items[item.name];
+        var itemEl = document.getElementById(item.name);
+        self.el.removeChild(itemEl);
+      }
     }
   });
 };
@@ -69,13 +74,14 @@ Inventory.prototype.list = function(){
   return this.game.inventory.join(', ');
 };
 
-Inventory.prototype.findItem = function(itemToFind, callback){
+Inventory.prototype.findItem = function(itemNameToFind, callback){
   if (this.isEmpty()){
     return callback(false, this.game.inventory);
   }
 
   this.each(function(item, items){
-    if (itemToFind === item){
+    console.log(itemNameToFind, item)
+    if (itemNameToFind === item){
       return callback(true, items);
     } else {
       return callback(false, items);
@@ -85,7 +91,6 @@ Inventory.prototype.findItem = function(itemToFind, callback){
 
 Inventory.prototype.each = function(callback){
   for (var item in this.game.inventory){
-    console.log(this.game.inventory)
     callback(item, this.game.inventory);
   }
 };
@@ -99,4 +104,4 @@ Inventory.prototype.isEmpty = function isEmpty(){
     }      
   }
   return true;
-}
+};

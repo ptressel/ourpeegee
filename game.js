@@ -57,6 +57,14 @@ var pizza = new Item({
   }
 });
 
+var more_pizza = new Item({
+  name: 'pizza',
+  position: {
+    x: 600,
+    y: 200
+  }
+})
+
 /*
 *
 * KEYBOARD
@@ -208,6 +216,7 @@ levelOne.on('init', function(){
   player.visible = true;
   door.addTo(game);
   pizza.addTo(game);
+  more_pizza.addTo(game);
   title.update('find the item and the door.');
 });
 
@@ -215,12 +224,23 @@ levelOne.on('update', function(interval){
   if (player.touches(door)){
     log.add('you found the door!');
     sceneManager.set(levelTwo);
+    inventory.remove(pizza);
+    console.log(game.inventory)
   }
 
   if (player.touches(pizza)){
-    log.add('you found the pizza!');
+    log.add('you found pizza!');
     pizza.remove();
     inventory.add(pizza);
+    console.log(game.inventory)
+    //inventory.display();
+  }
+
+
+  if (player.touches(more_pizza)){
+    log.add('you found pizza!');
+    more_pizza.remove();
+    inventory.add(more_pizza);
     console.log(game.inventory)
     //inventory.display();
   }
