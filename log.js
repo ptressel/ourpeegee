@@ -1,14 +1,17 @@
-var Text = require('./text');
+/*
+
+Creates the log in the top left of the screen.
+
+*/
 
 module.exports = Log;
 
 function Log(options){
   this.el = document.createElement('ul');
 
-  var body = document.querySelector('body');
-  body.appendChild(this.el);
+  document.body.appendChild(this.el);
 
-  //this.el.id = options.id || 'log';
+  this.el.id = options.id || 'log';
 
   this.el.style.overflow = 'scroll';
   this.el.style.display = 'block';

@@ -15,7 +15,11 @@ var game = new Game({
   backgroundColor: '#ffffff'
 });
 
-game.on('update', function(interval){});
+game.on('update', function(interval){
+  if (game.inventory.length > 0) {
+    //inventory.display();
+  }
+});
 
 game.on('draw', function(context){});
 
@@ -218,7 +222,7 @@ levelOne.on('update', function(interval){
     pizza.remove();
     inventory.add(pizza);
     console.log(game.inventory)
-    inventory.display();
+    //inventory.display();
   }
 });
 
