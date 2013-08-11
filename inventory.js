@@ -89,7 +89,18 @@ Inventory.prototype.findItem = function(itemNameToFind, callback){
   });
 };
 
-Inventory.prototype.each = function(callback){
+Inventory.prototype.hasItem = function hasItem(itemName, callback){
+  this.findItem(itemName, function(exists, items){
+    console.log(exists)
+    if (exists){
+      return callback(true);
+    } else {
+      return callback(false);
+    }
+  });
+};
+
+Inventory.prototype.each = function each(callback){
   for (var item in this.game.inventory){
     callback(item, this.game.inventory);
   }
